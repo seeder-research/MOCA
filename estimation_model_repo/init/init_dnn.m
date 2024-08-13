@@ -1,0 +1,43 @@
+function [dnn] = init_dnn()
+        
+    function n = linecount(fid)
+        n = 0;
+        tline = fgetl(fid);
+        while ischar(tline)
+          tline = fgetl(fid);
+          n = n+1;
+        end
+    end
+    
+    dnn = {
+    struct('name', 'LeNet-5', ...
+            'M', [1,6,16,120], ...
+            'N', [6,16,120,10], ...
+            'L', [28,10,1,1], ...
+            'K', [5,5,5,5], ...
+            'P', [1,1,1,1], ...
+            'S', [1,1,1,1])
+            };
+    
+    list_model_name = {'alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152'};
+    
+    total_nn = 9;
+    for i = 1:total_nn-1
+        file_path = './init/nn-mnlk/' + string(list_model_name{i}) + '-mnlkps.txt';
+        fileID = fopen(file_path,'r');
+        num_line = linecount(fileID);
+        fclose(fileID);
+        fileID = fopen(file_path,'r');
+        formatSpec = '%d';
+        file_size = [6 num_line];
+        MNLKPS = fscanf(fileID, formatSpec, file_size);
+        dnn{1, i+1} = struct('name', list_model_name(i), ...
+                            'M', MNLKPS(1, :), ...
+                            'N', MNLKPS(2, :), ...
+                            'L', MNLKPS(3, :), ...
+                            'K', MNLKPS(4, :), ...
+                            'P', MNLKPS(5, :), ...
+                            'S', MNLKPS(6, :) ...
+                            );
+    end
+end
